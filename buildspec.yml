@@ -1,0 +1,48 @@
+version: 0.2
+
+phases:
+
+  pre_build:
+    commands:
+      - echo "========================================="
+      - echo "Starting CodeBuild"
+      - echo "========================================="
+      - echo "Logging in to Docker Hub..."
+      - echo "$DOCKERHUB_PASSWORD" | docker login --username "$DOCKERHUB_USERNAME" --password-stdin
+
+  build:
+    commands:
+      - echo "========================================="
+      - echo "Running application validation"
+      - echo "========================================="
+      - test -f application/index.html
+      - test -f application/Dockerfile
+      - test -f application/images/github3.jpg
+
+      - echo "========================================="
+      - echo "Building Docker image"
+      - echo "========================================="
+      - docker build -t "$DOCKERHUB_USERNAME/intellipaat-website:$CODEBUILD_RESOLVED_SOURCE_VERSION" ./application
+
+      - echo "========================================="
+      - echo "Testing Docker container"
+      - echo "========================================="
+      - docker run -d --name intellipaat-test -p 8080:80 "$DOCKERHUB_USERNAME/intellipaat-website:$CODEBUILD_RESOLVED_SOURCE_VERSION"
+      - sleep 5
+      - curl -f http://127.0.0.1:8080
+      - docker rm -f intellipaat-test
+
+      - echo "========================================="
+      - echo "Tagging latest image"
+      - echo "========================================="
+      - docker tag "$DOCKERHUB_USERNAME/intellipaat-website:$CODEBUILD_RESOLVED_SOURCE_VERSION" "$DOCKERHUB_USERNAME/intellipaat-website:latest"
+
+  post_build:
+    commands:
+      - echo "========================================="
+      - echo "Pushing Docker image"
+      - echo "========================================="
+      - docker push "$DOCKERHUB_USERNAME/intellipaat-website:$CODEBUILD_RESOLVED_SOURCE_VERSION"
+      - docker push "$DOCKERHUB_USERNAME/intellipaat-website:latest"
+      - echo "Docker image pushed successfully."
+      - echo "Build completed on $(date)"

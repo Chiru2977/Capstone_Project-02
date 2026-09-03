@@ -1,0 +1,21 @@
+---
+- name: Configure all DevOps servers
+  hosts: all
+  become: true
+
+  roles:
+    - common
+
+- name: Configure Jenkins server
+  hosts: jenkins
+  become: true
+
+  roles:
+    - jenkins
+
+- name: Prepare Kubernetes nodes
+  hosts: kubernetes
+  become: true
+
+  roles:
+    - kubernetes

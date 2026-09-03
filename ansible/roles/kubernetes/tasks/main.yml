@@ -1,0 +1,15 @@
+---
+- name: Prepare Kubernetes nodes
+  ansible.builtin.import_tasks: prepare.yml
+
+- name: Initialize Kubernetes master
+  ansible.builtin.import_tasks: master.yml
+  when: inventory_hostname in groups['k8s_master']
+
+- name: Install Kubernetes CNI
+  ansible.builtin.import_tasks: cni.yml
+  when: inventory_hostname in groups['k8s_master']
+
+- name: Join Kubernetes workers
+  ansible.builtin.import_tasks: worker.yml
+  when: inventory_hostname in groups['k8s_workers']
