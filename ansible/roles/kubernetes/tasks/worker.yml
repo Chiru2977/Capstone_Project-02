@@ -1,0 +1,30 @@
+---
+- name: Check whether worker is already joined
+  ansible.builtin.stat:
+    path: /etc/kubernetes/kubelet.conf
+  register: kubelet_config
+
+- name: Generate worker join command on master
+  ansible.builtin.shell:
+    cmd: kubeadm token create --print-join-command > /tmp/kubeadm_join_command
+  delegate_to: k8s-master
+  run_once: true
+  when: not kubelet_config.stat.exists
+
+- name: Read worker join command from master
+  ansible.builtin.slurp:
+    src: /tmp/kubeadm_join_command
+  delegate_to: k8s-master
+  register: worker_join_command
+  when: not kubelet_config.stat.exists
+
+- name: Join worker to Kubernetes cluster
+  ansible.builtin.command:
+    cmd: "{{ worker_join_command.content | b64decode | trim }} --cri-socket unix:///run/containerd/containerd.sock"
+  when: not kubelet_config.stat.exists
+
+- name: Enable and start kubelet
+  ansible.builtin.systemd:
+    name: kubelet
+    enabled: true
+    state: started

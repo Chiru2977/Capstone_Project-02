@@ -1,0 +1,30 @@
+---
+- name: Check whether Kubernetes control plane is already initialized
+  ansible.builtin.stat:
+    path: /etc/kubernetes/admin.conf
+  register: kubeadm_admin_conf
+
+- name: Initialize Kubernetes control plane
+  ansible.builtin.command:
+    cmd: >-
+      kubeadm init
+      --apiserver-advertise-address={{ ansible_default_ipv4.address }}
+      --pod-network-cidr={{ pod_network_cidr }}
+  when: not kubeadm_admin_conf.stat.exists
+
+- name: Create .kube directory for ec2-user
+  ansible.builtin.file:
+    path: /home/ec2-user/.kube
+    state: directory
+    owner: ec2-user
+    group: ec2-user
+    mode: "0700"
+
+- name: Copy Kubernetes admin configuration
+  ansible.builtin.copy:
+    src: /etc/kubernetes/admin.conf
+    dest: /home/ec2-user/.kube/config
+    remote_src: true
+    owner: ec2-user
+    group: ec2-user
+    mode: "0600"

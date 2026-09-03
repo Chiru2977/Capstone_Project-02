@@ -1,0 +1,30 @@
+---
+- name: Install common packages
+  ansible.builtin.dnf:
+    name:
+      - git
+      - curl-minimal
+      - wget
+      - vim
+      - tar
+      - unzip
+      - gzip
+      - jq
+      - bash-completion
+      - ca-certificates
+    state: present
+    update_cache: true
+
+- name: Install Kubernetes networking utilities
+  ansible.builtin.dnf:
+    name:
+      - conntrack
+      - socat
+      - iproute-tc
+    state: present
+
+- name: Enable time synchronization
+  ansible.builtin.service:
+    name: chronyd
+    state: started
+    enabled: true

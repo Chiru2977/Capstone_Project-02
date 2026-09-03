@@ -1,0 +1,83 @@
+---
+- name: Install Java 21
+  ansible.builtin.dnf:
+    name: java-21-amazon-corretto
+    state: present
+    update_cache: true
+
+- name: Verify Java installation
+  ansible.builtin.command:
+    cmd: java -version
+  register: java_version
+  changed_when: false
+
+- name: Display Java version
+  ansible.builtin.debug:
+    var: java_version.stderr_lines
+
+
+- name: Download Jenkins repository
+  ansible.builtin.get_url:
+    url: https://pkg.jenkins.io/rpm-stable/jenkins.repo
+    dest: /etc/yum.repos.d/jenkins.repo
+    mode: "0644"
+
+- name: Import Jenkins repository GPG key
+  ansible.builtin.rpm_key:
+    state: present
+    key: https://pkg.jenkins.io/rpm-stable/jenkins.io-2026.key
+
+- name: Install Jenkins dependencies
+  ansible.builtin.dnf:
+    name:
+      - fontconfig
+    state: present
+
+- name: Install Jenkins
+  ansible.builtin.dnf:
+    name: jenkins
+    state: present
+    update_cache: true
+
+- name: Enable and start Jenkins
+  ansible.builtin.systemd:
+    name: jenkins
+    enabled: true
+    state: started
+    daemon_reload: true
+
+
+- name: Install Docker
+  ansible.builtin.dnf:
+    name: docker
+    state: present
+
+- name: Enable and start Docker
+  ansible.builtin.systemd:
+    name: docker
+    enabled: true
+    state: started
+
+- name: Add Kubernetes repository
+  ansible.builtin.yum_repository:
+    name: kubernetes
+    description: Kubernetes
+    baseurl: https://pkgs.k8s.io/core:/stable:/v1.36/rpm/
+    enabled: true
+    gpgcheck: true
+    gpgkey: https://pkgs.k8s.io/core:/stable:/v1.36/rpm/repodata/repomd.xml.key
+
+- name: Install kubectl
+  ansible.builtin.dnf:
+    name: kubectl
+    state: present
+
+- name: Verify kubectl installation
+  ansible.builtin.command:
+    cmd: kubectl version --client
+  register: kubectl_version
+  changed_when: false
+
+- name: Display kubectl version
+  ansible.builtin.debug:
+    var: kubectl_version.stdout
