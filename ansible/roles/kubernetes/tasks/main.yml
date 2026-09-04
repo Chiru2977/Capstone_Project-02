@@ -13,3 +13,7 @@
 - name: Join Kubernetes workers
   ansible.builtin.import_tasks: worker.yml
   when: inventory_hostname in groups['k8s_workers']
+
+- name: Deploy Intellipaat website
+  ansible.builtin.import_tasks: deploy_app.yml
+  when: inventory_hostname in groups['k8s_master']

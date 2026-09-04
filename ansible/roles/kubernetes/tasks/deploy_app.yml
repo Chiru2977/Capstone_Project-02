@@ -1,0 +1,66 @@
+---
+- name: Copy Kubernetes namespace manifest
+  ansible.builtin.copy:
+    src: "{{ playbook_dir }}/../../kubernetes/namespace.yaml"
+    dest: /tmp/namespace.yaml
+    mode: '0644'
+
+- name: Copy Kubernetes deployment manifest
+  ansible.builtin.copy:
+    src: "{{ playbook_dir }}/../../kubernetes/deployment.yaml"
+    dest: /tmp/deployment.yaml
+    mode: '0644'
+
+- name: Copy Kubernetes service manifest
+  ansible.builtin.copy:
+    src: "{{ playbook_dir }}/../../kubernetes/service.yaml"
+    dest: /tmp/service.yaml
+    mode: '0644'
+
+- name: Create Intellipaat namespace
+  ansible.builtin.command:
+    cmd: kubectl apply -f /tmp/namespace.yaml
+  register: namespace_result
+  changed_when: "'created' in namespace_result.stdout or 'configured' in namespace_result.stdout"
+
+- name: Deploy Intellipaat website
+  ansible.builtin.command:
+    cmd: kubectl apply -f /tmp/deployment.yaml
+  register: deployment_result
+  changed_when: "'created' in deployment_result.stdout or 'configured' in deployment_result.stdout"
+
+- name: Create Intellipaat website service
+  ansible.builtin.command:
+    cmd: kubectl apply -f /tmp/service.yaml
+  register: service_result
+  changed_when: "'created' in service_result.stdout or 'configured' in service_result.stdout"
+
+- name: Show deployment status
+  ansible.builtin.command:
+    cmd: kubectl get deployment -n intellipaat
+  register: deployment_status
+  changed_when: false
+
+- name: Display deployment status
+  ansible.builtin.debug:
+    var: deployment_status.stdout_lines
+
+- name: Show pod status
+  ansible.builtin.command:
+    cmd: kubectl get pods -n intellipaat -o wide
+  register: pod_status
+  changed_when: false
+
+- name: Display pod status
+  ansible.builtin.debug:
+    var: pod_status.stdout_lines
+
+- name: Show service status
+  ansible.builtin.command:
+    cmd: kubectl get service -n intellipaat
+  register: service_status
+  changed_when: false
+
+- name: Display service status
+  ansible.builtin.debug:
+    var: service_status.stdout_lines

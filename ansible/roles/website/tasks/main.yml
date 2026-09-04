@@ -1,0 +1,61 @@
+---
+- name: Copy Kubernetes namespace manifest
+  ansible.builtin.copy:
+    src: ../../../kubernetes/namespace.yaml
+    dest: /tmp/namespace.yaml
+    mode: '0644'
+
+- name: Copy Kubernetes deployment manifest
+  ansible.builtin.copy:
+    src: ../../../kubernetes/deployment.yaml
+    dest: /tmp/deployment.yaml
+    mode: '0644'
+
+- name: Copy Kubernetes service manifest
+  ansible.builtin.copy:
+    src: ../../../kubernetes/service.yaml
+    dest: /tmp/service.yaml
+    mode: '0644'
+
+- name: Create Intellipaat namespace
+  ansible.builtin.command:
+    cmd: kubectl apply -f /tmp/namespace.yaml
+  register: namespace_result
+  changed_when: "'created' in namespace_result.stdout or 'configured' in namespace_result.stdout"
+
+- name: Deploy Intellipaat website
+  ansible.builtin.command:
+    cmd: kubectl apply -f /tmp/deployment.yaml
+  register: deployment_result
+  changed_when: "'created' in deployment_result.stdout or 'configured' in deployment_result.stdout"
+
+- name: Create Intellipaat website service
+  ansible.builtin.command:
+    cmd: kubectl apply -f /tmp/service.yaml
+  register: service_result
+  changed_when: "'created' in service_result.stdout or 'configured' in service_result.stdout"
+
+- name: Wait for website deployment
+  ansible.builtin.command:
+    cmd: kubectl rollout status deployment/intellipaat-website -n intellipaat --timeout=120s
+  changed_when: false
+
+- name: Show website pods
+  ansible.builtin.command:
+    cmd: kubectl get pods -n intellipaat -o wide
+  register: pod_status
+  changed_when: false
+
+- name: Display website pods
+  ansible.builtin.debug:
+    var: pod_status.stdout_lines
+
+- name: Show website service
+  ansible.builtin.command:
+    cmd: kubectl get service intellipaat-website -n intellipaat
+  register: service_status
+  changed_when: false
+
+- name: Display website service
+  ansible.builtin.debug:
+    var: service_status.stdout_lines

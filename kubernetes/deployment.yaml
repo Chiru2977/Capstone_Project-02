@@ -1,21 +1,58 @@
 apiVersion: apps/v1
 kind: Deployment
+
 metadata:
   name: intellipaat-website
   namespace: intellipaat
+
 spec:
   replicas: 2
+
+  # Keep previous ReplicaSets for rollback
+  revisionHistoryLimit: 5
+
+  # Automatic rolling deployment
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+
   selector:
     matchLabels:
       app: intellipaat-website
+
   template:
     metadata:
       labels:
         app: intellipaat-website
+
     spec:
       containers:
         - name: intellipaat-website
-          image: chiru0977/intellipaat-website:1.0
+
+          image: chiru0977/intellipaat-website:latest
           imagePullPolicy: Always
+
           ports:
             - containerPort: 80
+
+          # Check whether nginx is ready to receive traffic
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 2
+            failureThreshold: 3
+
+          # Restart container if nginx becomes unhealthy
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 3

@@ -1,0 +1,8 @@
+---
+- name: Deploy Intellipaat Website
+  hosts: k8s_master
+  become: false
+
+  tasks:
+    - name: Deploy Intellipaat application
+      ansible.builtin.import_tasks: ../roles/kubernetes/tasks/deploy_app.yml
