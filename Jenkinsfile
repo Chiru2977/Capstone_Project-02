@@ -1,15 +1,30 @@
 pipeline {
     agent any
 
-    triggers {
-        cron('H 2 25 * *')
-    }
-
     stages {
 
         stage('Checkout') {
             steps {
                 checkout scm
+            }
+        }
+
+        stage('Set Release Image') {
+            steps {
+                script {
+                    env.IMAGE_TAG = sh(
+                        script: 'git rev-parse HEAD',
+                        returnStdout: true
+                    ).trim()
+
+                    env.IMAGE_NAME = 'chiru0977/intellipaat-website'
+
+                    echo "========================================="
+                    echo "Release Image"
+                    echo "========================================="
+                    echo "Git Commit : ${env.IMAGE_TAG}"
+                    echo "Docker Image: ${env.IMAGE_NAME}:${env.IMAGE_TAG}"
+                }
             }
         }
 
@@ -63,7 +78,7 @@ pipeline {
             }
         }
 
-        stage('Set Application Image') {
+        stage('Deploy Release Image') {
             steps {
                 withCredentials([
                     file(
@@ -72,8 +87,17 @@ pipeline {
                     )
                 ]) {
                     sh '''
-                        kubectl -n intellipaat set image deployment/intellipaat-website \
-                          intellipaat-website=chiru0977/intellipaat-website:1.0
+                        echo "========================================="
+                        echo "Deploying Release Image"
+                        echo "========================================="
+
+                        kubectl -n intellipaat set image \
+                          deployment/intellipaat-website \
+                          intellipaat-website=$IMAGE_NAME:$IMAGE_TAG
+
+                        echo "========================================="
+                        echo "Waiting for Rolling Update"
+                        echo "========================================="
 
                         kubectl -n intellipaat rollout status \
                           deployment/intellipaat-website \
@@ -113,6 +137,48 @@ pipeline {
 
                         kubectl get service \
                           -n intellipaat
+                    '''
+                }
+            }
+        }
+
+        stage('Verify Image') {
+            steps {
+                withCredentials([
+                    file(
+                        credentialsId: 'kubeconfig',
+                        variable: 'KUBECONFIG'
+                    )
+                ]) {
+                    sh '''
+                        echo "========================================="
+                        echo "Running Image"
+                        echo "========================================="
+
+                        kubectl get deployment intellipaat-website \
+                          -n intellipaat \
+                          -o jsonpath='{.spec.template.spec.containers[0].image}'
+
+                        echo
+
+                        echo "========================================="
+                        echo "Expected Image"
+                        echo "========================================="
+
+                        echo "$IMAGE_NAME:$IMAGE_TAG"
+
+                        echo "========================================="
+                        echo "Verifying Image"
+                        echo "========================================="
+
+                        RUNNING_IMAGE=$(kubectl get deployment \
+                          intellipaat-website \
+                          -n intellipaat \
+                          -o jsonpath='{.spec.template.spec.containers[0].image}')
+
+                        test "$RUNNING_IMAGE" = "$IMAGE_NAME:$IMAGE_TAG"
+
+                        echo "Image verification PASSED."
                     '''
                 }
             }
@@ -158,11 +224,11 @@ pipeline {
 
     post {
         success {
-            echo 'Jenkins Kubernetes deployment PASSED.'
+            echo 'Jenkins Kubernetes release PASSED.'
         }
 
         failure {
-            echo 'Jenkins Kubernetes deployment FAILED.'
+            echo 'Jenkins Kubernetes release FAILED.'
         }
     }
 }
