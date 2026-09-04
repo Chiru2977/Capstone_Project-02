@@ -1,24 +1,142 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Intellipaat DevOps Capstone</title>
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>DevOps Capstone - Version 2</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0f172a, #1e3a8a, #2563eb);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 900px;
+            text-align: center;
+            padding: 50px 30px;
+            background: rgba(255, 255, 255, 0.12);
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 8px 18px;
+            border-radius: 20px;
+            background: #22c55e;
+            color: #052e16;
+            font-weight: bold;
+            margin-bottom: 25px;
+        }
+
+        h1 {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        h2 {
+            font-size: 26px;
+            font-weight: normal;
+            margin-bottom: 25px;
+        }
+
+        p {
+            font-size: 18px;
+            line-height: 1.7;
+            margin-bottom: 30px;
+        }
+
+        .pipeline {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 25px;
+        }
+
+        .tech {
+            padding: 12px 18px;
+            background: rgba(255, 255, 255, 0.18);
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        .success {
+            margin-top: 35px;
+            padding: 15px;
+            border-radius: 10px;
+            background: rgba(34, 197, 94, 0.2);
+            border: 1px solid #22c55e;
+        }
+
+        footer {
+            margin-top: 30px;
+            font-size: 14px;
+            opacity: 0.8;
+        }
+    </style>
 </head>
 
-<body style="background-image:url('./images/github3.jpg'); background-size: 100%;">
+<body>
 
-    <h1 align="center">Hello World!</h1>
+    <div class="container">
 
-    <h2 align="center">
-        Intellipaat DevOps Capstone Project
-    </h2>
+        <div class="badge">
+            VERSION 2 DEPLOYMENT
+        </div>
 
-    <h3 align="center">
-        Terraform + Ansible + Kubernetes + Docker + Jenkins + AWS
-    </h3>
+        <h1>🚀 DevOps Capstone</h1>
 
-    <p align="center">
-        Deployment successfully completed!
-    </p>
+        <h2>Intellipaat Website</h2>
+
+        <p>
+            Welcome to the latest version of our application!
+            This website has been updated through our
+            automated DevOps deployment pipeline.
+        </p>
+
+        <div class="pipeline">
+
+            <div class="tech">AWS</div>
+
+            <div class="tech">Terraform</div>
+
+            <div class="tech">Ansible</div>
+
+            <div class="tech">Docker</div>
+
+            <div class="tech">Kubernetes</div>
+
+            <div class="tech">Jenkins</div>
+
+            <div class="tech">CodeBuild</div>
+
+        </div>
+
+        <div class="success">
+            ✅ New application version deployed successfully!
+        </div>
+
+        <footer>
+            CI/CD Pipeline • Kubernetes Rolling Update • DevOps Capstone Project
+        </footer>
+
+    </div>
 
 </body>
 </html>
