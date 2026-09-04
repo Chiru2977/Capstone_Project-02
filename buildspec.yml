@@ -13,7 +13,7 @@ phases:
   build:
     commands:
       - echo "========================================="
-      - echo "Running application validation"
+      - echo "Validating application"
       - echo "========================================="
       - test -f application/index.html
       - test -f application/Dockerfile
@@ -22,27 +22,35 @@ phases:
       - echo "========================================="
       - echo "Building Docker image"
       - echo "========================================="
-      - docker build -t "$DOCKERHUB_USERNAME/intellipaat-website:$CODEBUILD_RESOLVED_SOURCE_VERSION" ./application
+      - export IMAGE_TAG="$CODEBUILD_RESOLVED_SOURCE_VERSION"
+      - export IMAGE_NAME="$DOCKERHUB_USERNAME/intellipaat-website"
+
+      - docker build -t "$IMAGE_NAME:$IMAGE_TAG" ./application
 
       - echo "========================================="
       - echo "Testing Docker container"
       - echo "========================================="
-      - docker run -d --name intellipaat-test -p 8080:80 "$DOCKERHUB_USERNAME/intellipaat-website:$CODEBUILD_RESOLVED_SOURCE_VERSION"
+      - docker run -d --name intellipaat-test -p 8080:80 "$IMAGE_NAME:$IMAGE_TAG"
       - sleep 5
       - curl -f http://127.0.0.1:8080
       - docker rm -f intellipaat-test
 
       - echo "========================================="
-      - echo "Tagging latest image"
+      - echo "Creating latest tag"
       - echo "========================================="
-      - docker tag "$DOCKERHUB_USERNAME/intellipaat-website:$CODEBUILD_RESOLVED_SOURCE_VERSION" "$DOCKERHUB_USERNAME/intellipaat-website:latest"
+      - docker tag "$IMAGE_NAME:$IMAGE_TAG" "$IMAGE_NAME:latest"
 
   post_build:
     commands:
       - echo "========================================="
-      - echo "Pushing Docker image"
+      - echo "Pushing Docker images"
       - echo "========================================="
-      - docker push "$DOCKERHUB_USERNAME/intellipaat-website:$CODEBUILD_RESOLVED_SOURCE_VERSION"
-      - docker push "$DOCKERHUB_USERNAME/intellipaat-website:latest"
-      - echo "Docker image pushed successfully."
+      - docker push "$IMAGE_NAME:$IMAGE_TAG"
+      - docker push "$IMAGE_NAME:latest"
+
+      - echo "========================================="
+      - echo "Build completed"
+      - echo "========================================="
+      - echo "IMAGE_TAG=$IMAGE_TAG"
+      - echo "IMAGE=$IMAGE_NAME:$IMAGE_TAG"
       - echo "Build completed on $(date)"

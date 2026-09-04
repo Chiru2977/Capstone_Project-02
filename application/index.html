@@ -2,12 +2,23 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>DevOps Capstone - Version 2</title>
-
+    <title>DevOps Capstone - Version 2.0</title>
+    <!-- Modern Sans-serif Typography -->
+    <link rel="preconnect" href="https://googleapis.com">
+    <link rel="preconnect" href="https://gstatic.com" crossorigin>
+    <link href="https://googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
     <style>
+        :root {
+            --primary: #3b82f6;
+            --success: #10b981;
+            --bg-dark: #0b0f19;
+            --glass-bg: rgba(255, 255, 255, 0.04);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --text-muted: #94a3b8;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -15,128 +26,239 @@
         }
 
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Inter', sans-serif;
             min-height: 100vh;
-            background: linear-gradient(135deg, #0f172a, #1e3a8a, #2563eb);
-            color: white;
+            background: radial-gradient(circle at top left, #1e293b, #0f172a), #090d16;
+            color: #f8fafc;
             display: flex;
             justify-content: center;
             align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        /* Subtle grid background effect */
+        body::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image: linear-gradient(rgba(255,255,255,0.01) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.01) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: -1;
         }
 
         .container {
-            width: 90%;
-            max-width: 900px;
+            width: 100%;
+            max-width: 750px;
             text-align: center;
-            padding: 50px 30px;
-            background: rgba(255, 255, 255, 0.12);
-            border-radius: 20px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+            padding: 45px 35px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .badge-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 25px;
         }
 
         .badge {
-            display: inline-block;
-            padding: 8px 18px;
-            border-radius: 20px;
-            background: #22c55e;
-            color: #052e16;
-            font-weight: bold;
-            margin-bottom: 25px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 100px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .badge-v2 {
+            background: rgba(59, 130, 246, 0.15);
+            color: #60a5fa;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .badge-status {
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .status-dot {
+            width: 7px;
+            height: 7px;
+            background-color: var(--success);
+            border-radius: 50%;
+            animation: pulse 1.8s infinite;
         }
 
         h1 {
-            font-size: 48px;
-            margin-bottom: 15px;
+            font-size: 38px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 8px;
+            background: linear-gradient(to right, #ffffff, #cbd5e1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         h2 {
-            font-size: 26px;
-            font-weight: normal;
-            margin-bottom: 25px;
+            font-size: 20px;
+            font-weight: 500;
+            color: var(--primary);
+            margin-bottom: 24px;
         }
 
         p {
-            font-size: 18px;
-            line-height: 1.7;
-            margin-bottom: 30px;
+            font-size: 16px;
+            line-height: 1.6;
+            color: var(--text-muted);
+            max-width: 580px;
+            margin: 0 auto 35px auto;
         }
 
-        .pipeline {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
+        .pipeline-title {
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #64748b;
+            margin-bottom: 16px;
+            text-align: left;
+            padding-left: 4px;
+        }
+
+        .pipeline-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
             gap: 12px;
-            margin-top: 25px;
+            margin-bottom: 35px;
         }
 
-        .tech {
-            padding: 12px 18px;
-            background: rgba(255, 255, 255, 0.18);
-            border-radius: 10px;
-            font-weight: bold;
+        .tech-card {
+            padding: 14px 10px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #e2e8f0;
+            transition: all 0.25s ease;
+            cursor: default;
         }
 
-        .success {
-            margin-top: 35px;
-            padding: 15px;
-            border-radius: 10px;
-            background: rgba(34, 197, 94, 0.2);
-            border: 1px solid #22c55e;
+        .tech-card:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(59, 130, 246, 0.4);
+            transform: translateY(-2px);
+            color: #fff;
+            box-shadow: 0 10px 20px -10px rgba(59, 130, 246, 0.3);
+        }
+
+        .success-banner {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            padding: 16px;
+            border-radius: 14px;
+            background: rgba(16, 185, 129, 0.06);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            color: #a7f3d0;
+            font-size: 15px;
+            font-weight: 500;
         }
 
         footer {
-            margin-top: 30px;
-            font-size: 14px;
-            opacity: 0.8;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid var(--glass-border);
+            font-size: 12px;
+            color: #475569;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .footer-tag {
+            background: rgba(255,255,255,0.02);
+            padding: 3px 8px;
+            border-radius: 4px;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.5); }
+            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+
+        /* Responsive Breakpoint */
+        @media (max-width: 500px) {
+            .pipeline-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            h1 { font-size: 30px; }
+            .container { padding: 30px 20px; }
+            footer { justify-content: center; }
         }
     </style>
 </head>
-
 <body>
 
     <div class="container">
-
-        <div class="badge">
-            VERSION 2 DEPLOYMENT
+        
+        <div class="badge-container">
+            <span class="badge badge-v2">Release v2.0.0</span>
+            <span class="badge badge-status">
+                <span class="status-dot"></span>Active Deployment
+            </span>
         </div>
 
-        <h1>🚀 DevOps Capstone</h1>
-
+        <h1>DevOps Capstone</h1>
         <h2>Intellipaat Website</h2>
 
         <p>
-            Welcome to the latest version of our application!
-            This website has been updated through our
-            automated DevOps deployment pipeline.
+            Welcome to the live environment. This application layer has been updated seamlessly via an immutable, automated GitOps CI/CD workflow execution.
         </p>
 
-        <div class="pipeline">
-
-            <div class="tech">AWS</div>
-
-            <div class="tech">Terraform</div>
-
-            <div class="tech">Ansible</div>
-
-            <div class="tech">Docker</div>
-
-            <div class="tech">Kubernetes</div>
-
-            <div class="tech">Jenkins</div>
-
-            <div class="tech">CodeBuild</div>
-
+        <div class="pipeline-title">Pipeline Stack</div>
+        <div class="pipeline-grid">
+            <div class="tech-card">AWS Cloud</div>
+            <div class="tech-card">Terraform</div>
+            <div class="tech-card">Ansible</div>
+            <div class="tech-card">Docker Containers</div>
+            <div class="tech-card">Kubernetes</div>
+            <div class="tech-card">Jenkins Core</div>
+            <div class="tech-card">AWS CodeBuild</div>
         </div>
 
-        <div class="success">
-            ✅ New application version deployed successfully!
+        <div class="success-banner">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            Rolling Update Completed Successfully
         </div>
 
         <footer>
-            CI/CD Pipeline • Kubernetes Rolling Update • DevOps Capstone Project
+            <span>Project: DevOps Capstone</span>
+            <span class="footer-tag">Zero-Downtime Rollout</span>
         </footer>
 
     </div>
 
 </body>
 </html>
+
